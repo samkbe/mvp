@@ -46,6 +46,7 @@ function Metrics(props) {
 
     const styled = {
       backgroundColor: (performance >= 0) ? "#90EE90" : "#ffcccb",
+      padding: '5px',
     }
 
     return (
@@ -57,6 +58,5 @@ function Metrics(props) {
   }
 
 }
-
 
 export default Title;

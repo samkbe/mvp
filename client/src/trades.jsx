@@ -21,6 +21,8 @@ function Trades(props) {
     border: '1px solid #DCDCDC',
     height: '300px',
     marginRight: '10px',
+    overflowY: 'hidden',
+    width: '100%',
   }
 
   const rightBar = {
@@ -31,6 +33,7 @@ function Trades(props) {
     border: '1px solid #DCDCDC',
     height: '300px',
     marginLeft: '10px',
+    overflowY: 'auto',
   }
 
   return (
@@ -52,6 +55,7 @@ function Metrics(props) {
   const leaderStyle = {
     display: 'flex',
     border: '1px solid #DCDCDC',
+    overflowY: 'auto',
   }
 
   useEffect(() => {
@@ -65,15 +69,15 @@ function Metrics(props) {
       </div>
     )
   } else {
-    const sorted = leaders.sort((a, b) => a.profit - b.profit);
+    const sorted = leaders.filter((item) => !!item.profit).sort((a, b) => b.profit - a.profit);
     return (
       <div style={{fontFamily: 'roboto'}}>
         <h4>LEADERBOARD</h4>
-        {sorted.map((item) => {
+        {sorted.map((item, i) => {
           return (
             <div key={item.name} style={leaderStyle}>
-              <p>Name: {item.name}</p>
-              {(!!item.profit) ? <p>{item.profit.toFixed(2)}%</p> : <p>Not Enough Trade Data...</p>}
+              <p style={{paddingRight: '5px'}}><b>Name:</b> {item.name}</p>
+              {(!!item.profit) ? <p><b>Performance:</b>{item.profit.toFixed(2)}%</p> : <p><b>Performance:</b>Not Enough Trade Data...</p>}
             </div>
           )
         })}
@@ -190,8 +194,7 @@ function TradeList(props) {
     padding: '5px',
     margin: '5px',
     display: 'inline-flex',
-    overflow: 'scroll',
-    overflowX: '10px',
+    overflowY: 'auto',
     width: '100%',
   }
 
