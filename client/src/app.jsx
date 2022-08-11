@@ -7,6 +7,36 @@ import axios from 'axios';
 import { Button } from '@mui/material';
 
 
+export const leaderBoard = create((set) => ({
+  leaders: {},
+  setLeaders: async () => {
+    const results = await axios.get('/all');
+
+    function percentChecker(buy, profit) {
+      const yo = ((parseFloat(profit)) / (parseFloat(buy)) * 100).toFixed(2);
+      return parseFloat(yo);
+    }
+
+    function getProfit(arr) {
+      let percent = 0;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].completed) {
+          percent += percentChecker(arr[i].purchasePrice, arr[i].profit);
+        }
+      }
+      return (percent / arr.length);
+    }
+
+    const people = results.data.map((person) => {
+      return {
+        name: person.username,
+        profit: getProfit(person.trades),
+      }
+    })
+    set({leaders: people})
+  }
+}))
+
 export const useStore = create((set) => ({
   name: '',
   trades: {},
@@ -45,6 +75,8 @@ function App(props) {
   const [loggedIn, changeLoggedIn] = useState(false);
 
   const wrapper = {
+    boxShadow: '2px 2px 20px grey',
+    backgroundColor: 'white',
     border: '1px solid #DCDCDC',
     width: '75%',
     justifyContent: 'center',
@@ -52,7 +84,6 @@ function App(props) {
     height: 'max',
     marginTop: '10vh',
     borderRadius: '20px',
-    boxShadow: '2px 2px 20px #DCDCDC',
     padding: '10px',
   }
   if (loggedIn) {
@@ -85,10 +116,11 @@ function LoginForm({ loggedIn, changeLoggedIn }) {
     height: 'max',
     marginTop: '10vh',
     borderRadius: '20px',
-    boxShadow: '2px 2px 20px #DCDCDC',
+    boxShadow: '2px 2px 20px grey',
     padding: '10px',
     textAlign: 'center',
-    padding: '50px 0px'
+    padding: '50px 0px',
+    backgroundColor: 'white',
   }
 
   const formStyle = {

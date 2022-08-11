@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { createUser, getTrade, postTrade, sellTrade } = require('../db/db.js');
+const { createUser, getTrade, postTrade, sellTrade, getLeaders, getAll } = require('../db/db.js');
 
 const app = express();
 
@@ -11,6 +11,16 @@ const port = 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+app.get('/all', (req, res) => {
+  getAll()
+  .then((results) => res.send(results))
+  .catch((err) => {
+    console.log(err);
+    res.sendStatus(500);
+  })
+})
+
 
 app.post('/purchase', (req, res) => {
   createUser(req, res);
@@ -41,3 +51,14 @@ app.put('/sell', (req, res) => {
 })
 
 app.get('/purchase', getTrade);
+
+app.get('/leaderBoard', (req, res) => {
+  getLeaders(req)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log(err);
+    res.sendStatus(500);
+  })
+})

@@ -16,14 +16,6 @@ MongoClient.connect(uri, (err, client) => {
 });
 
 
-
-async function createAccount(req, res) {
-
-}
-
-
-
-
 async function createUser(request, response) {
   console.log(request.query.name);
   const bool = await dbConnect.countDocuments({username: request.query.name}, {limit: 1});
@@ -54,6 +46,11 @@ async function getTrade(req) {
   return await dbConnect.find(query).toArray();
 }
 
+async function getAll(req) {
+  return await dbConnect.find().toArray();
+}
+
+
 async function postTrade(request) {
   const filter = { username: request.query.name }
   const updatedoc = {
@@ -74,7 +71,7 @@ async function postTrade(request) {
 async function sellTrade(request) {
 
   function calculateProfit(purchase, sold) {
-    return (parseFloat(sold) - parseFloat(purchase).tofixed(10));
+    return ((parseFloat(sold) - parseFloat(purchase)));
   }
 
   const filter = { 'trades._id': ObjectID(request.query._id) }
@@ -88,9 +85,16 @@ async function sellTrade(request) {
   return await dbConnect.updateOne(filter, updatedoc);
 }
 
+async function getLeaders(request) {
+  return await dbConnect.find().sort({'trades.profit': 1})
+}
+
+
 module.exports = {
   postTrade: postTrade,
   getTrade: getTrade,
   createUser: createUser,
   sellTrade: sellTrade,
+  getLeaders: getLeaders,
+  getAll: getAll,
 }

@@ -11,10 +11,9 @@ function Buy(props) {
   const name = useStore((state) => state.name);
   const setPrices = useStore((state) => state.setPrices);
 
-  console.log('prices in buy: ', prices);
+
   useEffect(() => {
     setPrices();
-
     setInterval(() => {
       setPrices();
     }, 10000);
@@ -76,6 +75,7 @@ function Buy(props) {
 function Coin({ price, ticker }) {
 
   const name = useStore((state) => state.name);
+  const setTrades = useStore((state) => state.setTrades);
 
   const coinWrapper = {
     fontFamily: 'roboto',
@@ -99,6 +99,18 @@ function Coin({ price, ticker }) {
         ticker: ticker,
         price: price,
       }
+    }).then(() => {
+      axios({
+        method: 'post',
+        url: '/purchase',
+        params: { 'name': name }
+      })
+      .then((res) => {
+        if (typeof res.data === 'object') {
+          setTrades(res.data[0].trades);
+        }
+      })
+      .catch((err) => console.log(err))
     })
   }
 

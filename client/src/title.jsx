@@ -4,23 +4,6 @@ import { useStore } from './app.jsx';
 function Title(props) {
 
   const name = useStore((state) => state.name);
-  // const [time, changeTime] = useState(10);
-  // let num = 10;
-  // function timer() {
-  //   console.log(time);
-  //   if (time <= 0) {
-  //     changeTime(10);
-  //     num = 10;
-  //   }
-  //     num--;
-  //     changeTime(num);
-  // }
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     timer();
-  //   }, 1000);
-  // }, [])
 
   const titleStyle = {
     fontFamily: 'roboto',
@@ -31,7 +14,6 @@ function Title(props) {
   return (
     <div style={titleStyle}>
       <h4 style={{fontSize: '40px'}}>WELCOME TO TRADE TRACKER, {name.toUpperCase()}</h4>
-      {/* <h4>{time} seconds until refresh</h4> */}
       <Metrics />
     </div>
   )
@@ -40,10 +22,6 @@ function Title(props) {
 function Metrics(props) {
 
   const trades = useStore((state) => state.trades)
-  console.log('trades', trades);
-
-
-
 
   const tradeWrapper = {
     borderRadius: '5px',
@@ -65,5 +43,6 @@ function Metrics(props) {
   }
 
 }
+
 
 export default Title;

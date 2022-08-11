@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@mui/material';
-import { useStore } from './app.jsx';
+import { useStore, leaderBoard } from './app.jsx';
 
 
 function Trades(props) {
@@ -46,20 +46,51 @@ function Trades(props) {
 }
 
 function Metrics(props) {
+  const leaders = leaderBoard((state) => state.leaders);
+  const setLeaders = leaderBoard((state) => state.setLeaders);
 
-  return (
-    <div>
-      <p>LeaderBoard</p>
-    </div>
-  )
+  const leaderStyle = {
+    display: 'flex',
+    border: '1px solid #DCDCDC',
+  }
+
+  useEffect(() => {
+    setLeaders();
+  }, [])
+
+  if (!leaders.length) {
+    return (
+      <div>
+        <p>Loading....</p>
+      </div>
+    )
+  } else {
+    const sorted = leaders.sort((a, b) => a.profit - b.profit);
+    return (
+      <div style={{fontFamily: 'roboto'}}>
+        <h4>LEADERBOARD</h4>
+        {sorted.map((item) => {
+          return (
+            <div key={item.name} style={leaderStyle}>
+              <p>Name: {item.name}</p>
+              {(!!item.profit) ? <p>{item.profit.toFixed(2)}%</p> : <p>Not Enough Trade Data...</p>}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
 }
 
 function Trade({ ticker, purchasePrice, id, profit, completed}) {
 
   const name = useStore((state) => state.name);
   const prices = useStore((state) => state.prices);
-  console.log(ticker, profit);
+  const setTrades = useStore((state) => state.setTrades);
+
   const tradeWrapper = {
+    fontFamily: 'roboto',
     textAlign: 'center',
     paddingRight: '5px',
     height: 'max',
@@ -73,7 +104,7 @@ function Trade({ ticker, purchasePrice, id, profit, completed}) {
   }
 
   const completedWrapper = {
-    fontFamily: 'roboto-light',
+    fontFamily: 'roboto',
     fontWeight: '100',
     textAlign: 'center',
     paddingRight: '5px',
@@ -85,7 +116,7 @@ function Trade({ ticker, purchasePrice, id, profit, completed}) {
     verticalAlign: 'center',
     width: '100%',
     overflowX: '200px',
-    backgroundColor: profit >= 0 ? "green" : "red",
+    backgroundColor: profit >= 0 ? "#90EE90" : "#ffcccb",
     onHover: {
       height: '90%',
       width: '90%',
@@ -99,6 +130,11 @@ function Trade({ ticker, purchasePrice, id, profit, completed}) {
     }
   }
 
+  function percentChecker(buy, profit) {
+    return (profit / (parseFloat(buy)) * 100).toFixed(2);
+  }
+
+
   function sendSellToServer() {
     axios({
       method: 'put',
@@ -110,13 +146,25 @@ function Trade({ ticker, purchasePrice, id, profit, completed}) {
         sellPrice: getPrice(ticker),
         _id: id,
       }
+    }).then(() => {
+        axios({
+          method: 'post',
+          url: '/purchase',
+          params: { 'name': name }
+        })
+        .then((res) => {
+          if (typeof res.data === 'object') {
+            setTrades(res.data[0].trades);
+          }
+        })
+        .catch((err) => console.log(err))
     })
   }
   if (completed) {
     return (
       <div style={completedWrapper}>
         <h4>Purchased: {ticker.toUpperCase()}</h4>
-        {profit >= 0 ? <h4>You took a {profit} dollar W</h4> : <h4>You took a {profit} dollar L</h4>}
+        {profit >= 0 ? <h4>You took a {percentChecker(purchasePrice, profit)}% W</h4> : <h4>You took a {percentChecker(purchasePrice, profit)}% L</h4>}
       </div>
     )
   } else {
