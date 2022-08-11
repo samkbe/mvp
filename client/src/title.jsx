@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStore } from './app.jsx';
+import { useStore, leaderBoard } from './app.jsx';
 
 function Title(props) {
 
@@ -21,23 +21,37 @@ function Title(props) {
 
 function Metrics(props) {
 
-  const trades = useStore((state) => state.trades)
+  const leaders = leaderBoard((state) => state.leaders);
+  const name = useStore((state) => state.name);
 
   const tradeWrapper = {
     borderRadius: '5px',
     boxShadow: '1px 1px 5px #DCDCDC',
   }
 
-  if (trades) {
+  if (!leaders.length || !name) {
     return (
-      <div style={tradeWrapper}>
-
-      </div>
+      <></>
     )
   } else {
-    return (
-      <div style={tradeWrapper}>
 
+    function findMetrics() {
+      for (let i = 0; i < leaders.length; i++) {
+        if (name === leaders[i].name) {
+          return leaders[i].profit;
+        }
+      }
+    }
+    const performance = findMetrics();
+
+    const styled = {
+      backgroundColor: (performance >= 0) ? "#90EE90" : "#ffcccb",
+    }
+
+    return (
+      <div style={styled}>
+        <h2>Overall performance: </h2>
+        {performance >= 0 ? <p>You are up {performance.toFixed(2)}% </p> : <p>You are down {performance.toFixed(2)}% </p>}
       </div>
     )
   }
